@@ -341,6 +341,7 @@ def train(args, labeled_trainloader, unlabeled_trainloader, test_loader,
         losses = AverageMeter()
         losses_x = AverageMeter()
         losses_u = AverageMeter()
+        losses_mix_u = AverageMeter()
         mask_probs = AverageMeter()
         if not args.no_progress:
             p_bar = tqdm(range(args.eval_step),
@@ -413,7 +414,7 @@ def train(args, labeled_trainloader, unlabeled_trainloader, test_loader,
             end = time.time()
             mask_probs.update(mask.mean().item())
             if not args.no_progress:
-                p_bar.set_description("Train Epoch: {epoch}/{epochs:4}. Iter: {batch:4}/{iter:4}. LR: {lr:.4f}. Data: {data:.3f}s. Batch: {bt:.3f}s. Loss: {loss:.4f}. Loss_x: {loss_x:.4f}. Loss_u: {loss_u:.4f}. Mask: {mask:.2f}. ".format(
+                p_bar.set_description("Train Epoch: {epoch}/{epochs:4}. Iter: {batch:4}/{iter:4}. LR: {lr:.4f}. Data: {data:.3f}s. Batch: {bt:.3f}s. Loss: {loss:.4f}. Loss_x: {loss_x:.4f}. Loss_u: {loss_u:.4f}. Loss_mix_u: {loss_mix_u:.4f} . Mask: {mask:.2f}. ".format(
                     epoch=epoch + 1,
                     epochs=args.epochs,
                     batch=batch_idx + 1,
@@ -424,6 +425,7 @@ def train(args, labeled_trainloader, unlabeled_trainloader, test_loader,
                     loss=losses.avg,
                     loss_x=losses_x.avg,
                     loss_u=losses_u.avg,
+                    loss_mix_u=losses_mix_u.avg,
                     mask=mask_probs.avg))
                 p_bar.update()
 
@@ -441,7 +443,8 @@ def train(args, labeled_trainloader, unlabeled_trainloader, test_loader,
             args.writer.add_scalar('train/1.train_loss', losses.avg, epoch)
             args.writer.add_scalar('train/2.train_loss_x', losses_x.avg, epoch)
             args.writer.add_scalar('train/3.train_loss_u', losses_u.avg, epoch)
-            args.writer.add_scalar('train/4.mask', mask_probs.avg, epoch)
+            args.writer.add_scalar('train/4.train_loss_mix_u', losses_mix_u.avg, epoch)
+            args.writer.add_scalar('train/5.mask', mask_probs.avg, epoch)
             args.writer.add_scalar('test/1.test_acc', test_acc, epoch)
             args.writer.add_scalar('test/2.test_loss', test_loss, epoch)
 
